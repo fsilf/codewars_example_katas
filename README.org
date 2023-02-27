@@ -1,0 +1,260 @@
+#+title: Some CodeWars Example Katas
+#+author: fsilvaf
+
+* Some CodeWars Example Katas
+** Roman Numerals Helper
+- Full kata description and constrains at codewars: [[https://www.codewars.com/kata/51b66044bce5799a7f000003/python][4kyu - Roman Numerals Helper]]
+
+Create a RomanNumerals class that can convert a roman numeral to and from an integer value.
+
+Modern Roman numerals are written by expressing each digit separately starting with the left most digit and skipping any digit with a value of zero. In Roman numerals 1990 is rendered: 1000=M, 900=CM, 90=XC; resulting in MCMXC. 2008 is written as 2000=MM, 8=VIII; or MMVIII. 1666 uses each Roman symbol in descending order: MDCLXVI.
+
+*** Python code
+#+begin_src python
+  class RomanNumerals:
+      romans = {
+          "M": 1000,
+          "CM": 900,
+          "D": 500,
+          "CD": 400,        
+          "C": 100,
+          "XC": 90,
+          "L": 50,
+          "XL": 40,
+          "X": 10,
+          "IX": 9,
+          "V": 5,
+          "IV": 4,
+          "I": 1}
+
+      def to_roman(val):
+          roman_num = ""
+          for roman_key, roman_val in RomanNumerals.romans.items():
+              while (val // roman_val > 0):
+                  roman_num += roman_key;
+                  val -= roman_val
+          return roman_num;
+
+      def from_roman(s_roman):
+          val = 0
+          romans = RomanNumerals.romans
+          for i in range(len(s_roman)):
+              if (i < len(s_roman) - 1) and (romans[s_roman[i]] < romans[s_roman[i+1]]):
+                  val -= romans[s_roman[i]]
+              else:
+                  val += romans[s_roman[i]]
+          return val
+ #+end_src
+  
+*** C++ code
+#+begin_src cpp
+  #include <iostream>
+  #include <map>
+  #include <vector>
+  #include <string>
+  #include <algorithm>
+
+  class RomanHelper
+  {
+      public:
+          std::map<std::string, int>romans = {
+              {"M" , 1000},
+              {"CM" , 900},
+              {"D" , 500},
+              {"CD" , 400},
+              {"C" , 100},
+              {"XC" , 90},
+              {"L" , 50},
+              {"XL" , 40},
+              {"X" , 10},
+              {"IX" , 9},
+              {"V" , 5},
+              {"IV", 4},
+              {"I" , 1}
+          };
+          std::vector<std::string>keys = {
+                      "M", "CM", "D", "CD", "C", "XC",
+                      "L", "XL", "X", "IX", "V", "IV", "I"};
+          std::string to_roman(unsigned int n);
+          int         from_roman(std::string rn);
+
+       private:   
+          int         _complex_keys(int &res, int &i_key, 
+                                      std::string::iterator &it);
+          int         _compare_long_keys(std::string key,
+                                      std::vector<std::string>l_keys);
+
+  } RomanNumerals;
+
+  std::string RomanHelper::to_roman(unsigned int n){
+      std::string out;
+
+      std::vector<std::string>::iterator it;
+      for(it = this->keys.begin(); it != this->keys.end(); it++)
+      {
+          if (n / romans[*it] > 0)
+          {
+              int num_times = n / romans[*it];
+              for (int i = 0; i < num_times; i++)
+              {
+                  out += *it;
+              }
+              n = n % romans[*it];
+          }
+      }
+      return out;
+  }
+
+  int    RomanHelper::_complex_keys(int &res, int &i_key, 
+                                      std::string::iterator &it)
+  {
+      char first_letter = this->keys[i_key][0];
+      char second_letter = this->keys[i_key][1];
+
+      if (*it == first_letter && *(it+1) == second_letter)
+      {
+          res += this->romans[this->keys[i_key]];
+          it++;
+          i_key += 1;
+          return (1);
+      }
+      i_key += 1;
+      return (0);
+  }
+
+  int     RomanHelper::_compare_long_keys(std::string key,
+                                     std::vector<std::string>l_keys)
+  {
+      for(auto& str : l_keys)
+      {
+          if (!key.compare(str))
+              return (1);
+      }
+      return (0);
+  }
+
+  int         RomanHelper::from_roman(std::string rn){
+      int res = 0;
+      int i_key = 0;
+      std::vector<std::string> l_keys = {
+                      "CM", "CD", "XC", "XL","IX", "IV"};
+
+      for(std::string::iterator it = rn.begin(); it != rn.end(); it++)
+      {
+          while(1)
+          {
+              if (this->_compare_long_keys(this->keys[i_key], l_keys))
+              {
+                  if (this->_complex_keys(res, i_key, it))
+                      break;
+              }
+              else if (this->keys[i_key][0] == *it)
+              {
+                  res += this->romans[this->keys[i_key]];
+                  break;
+              }
+              else
+                  i_key += 1;
+          }
+      }
+      return res;
+  }
+
+  int main()
+  {
+    
+      std::cout << RomanNumerals.to_roman(1990) << std::endl;
+      std::cout << RomanNumerals.to_roman(2447) << std::endl;
+      std::cout << RomanNumerals.from_roman("XXI") << std::endl;
+      std::cout << RomanNumerals.from_roman("MDCLXVI") << std::endl;
+      std::cout << RomanNumerals.from_roman("MDCLXIV") << std::endl;
+      return(0);
+  }
+#+end_src
+
+** Connect Four
+- Full kata description and constrains at codewars: [[https://www.codewars.com/kata/56882731514ec3ec3d000009/python][4kyu - Connect Four]]
+
+The grid is 6 row by 7 columns, those being named from A to G. You will receive a list of strings showing the order of the pieces which dropped in columns:
+
+#+begin_src python
+  pieces_position_list = ["A_Red",
+                          "B_Yellow",
+                          "A_Red",
+                          "B_Yellow",
+                          "A_Red",
+                          "B_Yellow",
+                          "G_Red",
+                          "B_Yellow"]
+#+end_src
+
+The first player who connects four items of the same color is the winner.
+
+*** Python code
+#+begin_src python
+  import re
+
+  def check_diagonals(strng, pat):
+      # check diagonals 1
+      diags = ''
+      for num in [0,1,2,3,7,14]:
+          i = 0
+          while True:
+              t_sum = num + 8 * i 
+              if t_sum <= 41:
+                  diags = ''.join([diags, strng[t_sum]])
+                  i += 1
+              else:
+                  diags += ' ' 
+                  break
+      # check diagonals 2
+      for num, sum_min in zip([21, 28, 35, 36, 37, 38], [3, 4, 5, 6, 13, 20]):
+          i = 0
+          while True:
+              t_sum = num - 6 * i 
+              if t_sum >= sum_min:
+                  diags = ''.join([diags, strng[t_sum]])
+                  i += 1
+              else:
+                  diags += ' ' 
+                  break
+
+      if pat.search(diags) is not None:
+          return 'win'
+
+  def who_is_winner(pieces_position_list):
+
+      # dictionaries to convert and keep tract of the moves
+      columns = {letter:num for letter, num in zip([*'ABCDEFGG'], [*'0123456'])}
+      moves_mem = {num:5 for num in [*'0123456']}  
+      # pattern to convert the moves
+      convert = lambda match: columns[match.group(1)]
+      move_pattern = re.compile('([ABCDEFG])_.*$')
+      # pattern to win
+      four_pattern = re.compile('OOOO|XXXX')    
+      # create base board
+      board = 'E' * 42
+      # get first player
+      player = 'O' if pieces_position_list[0].split('_')[1] == 'Yellow' else 'X'
+
+      # moves
+      for move in pieces_position_list:
+          # record move
+          move = move_pattern.sub(convert,move)
+          pos = int(move) + moves_mem[move] * 7
+          board = board[:pos] + player + board[pos + 1:]
+          moves_mem[move] -= 1
+
+          # check rows and columns
+          current_rows = [board[i: i + 7] for i in [0,7,14,21,28,35]]
+          current_columns = [''.join(x) for x in zip(*current_rows)]
+          if four_pattern.search(' '.join([*current_rows, *current_columns])) is not None:
+              return 'Red' if player == 'X' else 'Yellow'
+
+          # check diagonals
+          if check_diagonals(board, four_pattern) is not None:
+              return 'Red' if player == 'X' else 'Yellow'
+          # assign next player
+          player = 'O' if player == 'X' else 'X'
+      return 'Draw'
+#+end_src
