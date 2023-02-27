@@ -1,4 +1,3 @@
-#+title: Some CodeWars Example Katas
 #+author: fsilvaf
 
 * Some CodeWars Example Katas
